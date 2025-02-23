@@ -7,11 +7,24 @@
     "theme_color": "#0000ff",
     "orientation": "portrait-primary",
     "description": "A simple weather app using OpenWeatherMap API",
+    "screenshots": [
+      {
+        "src": "images/image_for_weather_app-removebg-preview.png",
+        "sizes": "500x500",
+        "type": "image/png",
+        "form_factor": "wide"
+      },
+      {
+        "src": "images/image_for_weather_app-removebg-preview.png",
+        "sizes": "500x500",
+        "type": "image/png"
+      }
+    ],
     "icons": [
       {
-        "src": "/Users/john/Documents/Spring-2025-Semester/CSC-3100-Web_Programming/Weather-app/Weather-app-web-dev/images/image_for_weather_app-removebg-preview.png",
+        "src": "images/image_for_weather_app-removebg-preview.png",
         "type": "image/png",
-        "sizes": "192x192"
+        "sizes": "500x500"
       }
     ]
   }
