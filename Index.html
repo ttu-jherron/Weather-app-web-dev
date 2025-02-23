@@ -1,0 +1,297 @@
+<!--
+# Author: John Herron
+# Date: 25 January 2025
+# Description: Creating a weather app using HTML, CSS, and Javascript along with the Bootstrap and Bootstrap icons libraries
+#              the app will provide the current temperature, humidity, and a indicator of the current conditions
+-->
+<!--this assignment must contain the minimum "current temperature, humidity,
+    and a indicator of the current conditions" -->
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+        <title>Live Weather App</title>
+
+
+        <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+        <link rel="apple-touch-icon" href="images/apple-touch-icon-iphone-60x60.png">
+        <link rel="apple-touch-icon" sizes="60x60" href="images/apple-touch-icon-ipad-76x76.png">
+        <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-iphone-retina-120x120.png">
+        <link rel="apple-touch-icon" sizes="144x144" href="images/apple-touch-icon-ipad-retina-152x152.png">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+        <link rel="manifest" href="manifest.json"> <!-- Here is the link to the manifest file-->
+
+        <!-- ***STRETCH GOAL*** -->
+        <!--I asked chatgpt how i could make a background theme for my weather app
+            It told me i could use built in css using the style tag in my head tag to assign images
+            to my theme of my app. It also recommended unsplash.com and I feel like i was able
+            to find a perfect image for my app! I made sure to comment all new topics for future use-->
+        <style>
+            body{
+                /*So with css you can directly source the image by copying the image address from a website without needing to download the image */
+                background-image: url('https://images.unsplash.com/photo-1513002749550-c59d786b8e6c?q=80&w=2848&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+                background-size: cover; /*this will make the image cover the entire screen*/
+                background-repeat: no-repeat; /*this will prevent the image from repeating*/
+                background-attachment: fixed; /*this will make the image stay in place*/
+                background-position: center; /*this will center the image*/
+            }
+        </style>
+    </head>
+    <body>
+        <div class= "d-flex align-items-center justify-content-center">
+            <div class = "card col-4 col-md-4 col-lg-4 mt-3">
+                <h1 class="text-center">Live Weather App</h1>
+            </div>
+        </div>
+        <div class="d-flex justify-content-center align-items-center vh-100 gap-4">
+            <div class="row gap-3"> <!-- I asked chatgpt how to get my cards/widgets closer together and it recommended to use rows which is something we havent touched on in class but it gave me something closer to what i was looking for-->
+                <!-- Create card for time of day and location-->
+                <div class="card col-5 col-md-5 col-lg-5 ms-5" id = "currentTimeLocation">
+                    <div class = "card-body">
+                        <p class="text-center mb-0 text-black">Current time & Location:</p>
+                        <i class=""></i> <!-- this is how we use icons from bootstrap icons-->
+                    </div>
+                </div>
+    
+                <!-- Create card for current temperature -->
+                <div class="card col-5 col-md-5 col-lg-5 " id = "currentTemperature"> <!-- "ms-0" is how to move the card away from the left-->
+                    <div class = "card-body">
+                        <p class="text-center mb-0 text-black">Current Temperature:</p>
+                        <i class=""></i> <!-- this is how we use icons from bootstrap icons-->
+                    </div>
+                </div>
+    
+                <!-- Create card for humidity -->
+                <div class="card col-5 col-md-5 col-lg-5 ms-5" id = "currentHumidity"> <!-- "me-0" is how to move the card away from the right-->
+                    <div class = "card-body">
+                        <p class="text-center mb-0 text-black">Current Humidity:</p>
+                        <i class="" style="color:blue"></i> <!-- this is how we use icons from bootstrap icons-->
+                    </div>
+                </div>
+    
+                <!-- Create card for current conditions -->
+                <div class="card col-5 col-md-5 col-lg-5" id = "currentConditions">
+                    <div class = "card-body">
+                        <p class="text-center mb-0 text-black">Current Conditions:</p>
+                        <i class=""></i> <!-- this is how we use icons from bootstrap icons-->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p style="font-family:cursive" class="text-center text-black mb-4"> <!-- I asked chatgpt how to change the font of my text to cursive and it recommended to use the font-family attribute-->
+            All live weather data provided by the app is thanks to Open Meteo https://open-meteo.com/en/docs
+        </p>
+    
+        <!-- Javascript section of code -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script> <!-- Bootstrap, used for styling -->
+        <script rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"></script>
+        <script>
+    
+            // Function to get the user's location, this function will use the navigator.geolocation function to get the user's longitude and latitude
+            // We can then send that longitude and latitude to other features of our app.
+            if(navigator.geolocation){ // This is a check to see if the browser supports geolocation
+                navigator.geolocation.getCurrentPosition((position) =>{ // this function will get the user's longitude and latitude
+                    let latitude = position.coords.latitude
+                    let longitude = position.coords.longitude
+    
+                    getWeatherData(latitude, longitude) // we will then send the longitude and latitude to the getWeatherData function
+                }, error =>{
+                    // Location permissions were not allowed so we notify the user that they must enable location features
+                    Swal.fire({
+                        title: "Oh no, you have an error!",
+                        text: "Location features must be enabled to retrieve weather information",
+                        icon: "error",
+                    })
+                    console.error("Error getting location: ", error.message) // This will log the error to the console
+                    getWeatherData(36.162838, 85.501640) // Default location is Cookeville, TN
+                });
+            } else{
+                // The app can not get weather data without gps information, and was unable to use geolocation
+                console.error("Geolocation is not supported by this browser.")
+                Swal.fire({
+                    title: "Oh no, you have an error!",
+                    html: "This device must have location features to provide accurate weather data.",
+                    icon: "error"
+                })
+            }
+
+            // This function is used to find out where the user is located based on the latitude and longitude
+            // for me this didnt work all that well because i couldnt get city, town, or village to show up for me
+            async function getLocationName(latitude, longitude){
+                try{ // This is a async function where we are using awaits to fetch information and wait for the action to be completed
+                    const response = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`)
+                    if (!response.ok){
+                        throw new Error(`HTTP Error Status: ${response.status}`)
+                    }
+                    const data = await response.json()
+                    // Returning the city, town, or village name, if any, else returning "Unknown Location"
+                    // Note: This is a basic example and may not work perfectly for all locations, especially those in remote areas or those without a city, town, or village name.
+                    // However for the purposes of this app, it should work well enough.
+                    return data.address.city || data.address.town || data.address.village || data.address.county || data.address.state || "Unknown Location"
+                } catch(error){ // This is a catch block that will catch any errors that occur during the fetch process
+                    console.error("Error fetching location data: ", error)
+                    return "Unknown Location"
+                }
+            }
+            
+            // This function will fetch weather data from the open-meteo API, this is the big function in our program
+            // This function does a lot, we send in the latitude and longitude that we got earlier, it then searches the weather data in the API request using that latitude and longitude data
+            // We will then send that data to the HTML elements we created at the beginning of the program
+            // This function also will assign dynamic icons to the app based on the data retrieved from the API and the users current location
+            async function getWeatherData(strLat,strLong){
+                
+                const strMetroAPI = `https://api.open-meteo.com/v1/forecast?current=temperature_2m,relative_humidity_2m,is_day,weather_code&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=auto&latitude=${strLat}&longitude=${strLong}`
+
+                try{ // This is a async function where we are using awaits to fetch information and wait for the action to be completed
+                    const objResponse = await fetch(strMetroAPI,{
+                        method: "GET", // we use method of 'GET' to get the data from the API
+                        headers: {
+                            "Content-Type": "application/json"
+                        }
+                    })
+                    
+                    if(!objResponse.ok){ // Here we make sure that the we were able to get the data from the API
+                        throw new Error(`HTTP Error Status:${objResponse.status}`)
+                    }
+    
+                    const objData = await objResponse.json() // store the data we got from the API in a variable
+                    console.log(objData) //This was used for testing to see the objects we could collect from the API
+    
+    
+//This next section of code was created with the help of chatGTP and i will do my best to explain everything that was used here
+    
+                    // Storing the values we need
+                    const temperature = objData.current.temperature_2m.toFixed(0) //toFixed(0) is used to round the number to the nearest whole number, 0 is 0 decimals
+                    const humidity = objData.current.relative_humidity_2m.toFixed(0)
+
+                    // This next line of code is very new and chatgpt actually recommended it objData.current.is_day: This is accessing the is_day property from the current object within objData.
+                    // This property is expected to be a number (typically 1 or 0) indicating whether it is day (1) or night (0).
+                    // === 1: This checks if the value of objData.current.is_day is equal to 1.
+                    // ? "Day" : "Night": This is the ternary operator. If the condition objData.current.is_day === 1 is true, it returns the string "Day". If the condition is false, it returns the string "Night".
+                    const isDay = objData.current.is_day === 1 ? "Day" : "Night"
+
+                    // This is also a new section of code recommended by chatgpt when i wanted to get a more specific time, day, year, ect.
+                    // new Date(objData.current.time): This creates a new Date object using the time property from the current object within objData.
+                    // The time property is expected to be a timestamp or a date string.
+                    // .toLocaleString("en-US", { ... }): This converts the Date object to a string using the toLocaleString method,
+                    // which formats the date and time according to the specified locale ("en-US" in this case) and options.
+                    const time = new Date(objData.current.time).toLocaleString("en-US", {
+                        weekday: "long",  // "Saturday"
+                        year: "numeric",  // "2025"
+                        month: "long",    // "February"
+                        day: "numeric",   // "22"
+                        hour: "numeric",  // "10"
+                        minute: "numeric", // "15"
+                        hour12: true      // 12-hour format with AM/PM
+                    });
+                    const location = await getLocationName(strLat, strLong) // This is a function that will get the location name based on the latitude and longitude
+    
+                    // Selecting the HTML elements to update, this is used to clean up the code a little
+                    const temperatureCard = document.getElementById("currentTemperature")
+                    const humidityCard = document.getElementById("currentHumidity")
+                    const conditionsCard = document.getElementById("currentConditions")
+                    const timeLocationCard = document.getElementById("currentTimeLocation")
+    
+                    // Updating the cards with the weather data, this is where we are updating the p tags with new innerHTML and using the variables earlier to create dynamic statistics for the user based on their location
+                    temperatureCard.querySelector('.card-body p').innerHTML = `Current Temperature: <span class="text-primary">${temperature}°F</span>`                                                         //Span can be used to change color of the text inline like this using class,
+                    humidityCard.querySelector('.card-body p').innerHTML = `Current Humidity: <span class="text-primary">${humidity}%</span>`                                                                   //however if we wanted to make the font a specific color
+                    conditionsCard.querySelector('.card-body p').innerHTML = `Current Conditions: <span class="text-primary">${isDay}</span>`                                                                   //We could use <span style="color: black;>${temperature}°F</span>"
+                    timeLocationCard.querySelector('.card-body p').innerHTML = `Current Time & Location: <span class="text-primary">${time}</span> Location: <span class="text-secondary">${location}</span>`   //This would have made the font black for just that specific selection of text.
+    
+                    // Store the time of day for bootstrap dynamic icons
+                    const timeOfDay = objData.current.is_day
+
+                    let timeOfDayIcon = "" // this will hold the icon for the time of day for example a moon or sun
+                    let timeOfDayIconColor = "" // this will hold the color for the icon for example a moon may need to be gray while a sun may need to be yellow
+
+                    if (timeOfDay == 0){ // 0 means no time of day so its night time
+                        timeOfDayIcon = "bi-moon-fill" // name of bootstrap dynamic icons this is a moon icon
+                        timeOfDayIconColor = "gray"
+                    }
+                    else if (timeOfDay == 1){ // 1 means its day time
+                        timeOfDayIcon = "bi-sun-fill style" // name of bootstrap dynamic icons this is a sun icon and we are making it yellow
+                        timeOfDayIconColor = "yellow"
+                    }
+                    // Here we set the class for i tag to the timeOfDayIcon
+                    // and we set the .style.color to the color to timeOfDayIconColor
+                    document.querySelector("#currentConditions i").className = `${timeOfDayIcon}`
+                    document.querySelector("#currentConditions i").style.color = `${timeOfDayIconColor}`
+
+                    // Store the weather conditions for bootstrap dynamic icons
+                    // We now do what we did for the previous function but for more icons so this will be more simplified
+                    const weatherCondition = objData.current.weather_code
+    
+                    let weatherIcon = "" // holds icon for the weather condition
+                    let weatherIconColor = "" // holds color for the weather condition icon
+    
+                    if(weatherCondition == 0){ // its sunny weather
+                        weatherIcon = "bi-sun-fill" // image for a sun
+                        weatherIconColor = "yellow"
+                    }
+                    // its cloudy weather
+                    else if(weatherCondition == 1 ||weatherCondition == 2 || weatherCondition == 3){
+                        weatherIcon = "bi-cloud-fill" // image for a cloud
+                    }
+                    else if(weatherCondition == 45 || weatherCondition == 48){ // its foggy weather
+                        weatherIcon = "bi-cloud-fog" // image for fog
+                        weatherIconColor = "gray"
+                    }
+                    else if(weatherCondition == 51 || weatherCondition == 53 | weatherCondition == 55){ // its drizzle rain weather
+                        weatherIcon = "bi-cloud-drizzle" // image for drizzle rain
+                        weatherIconColor = "blue"
+                    }
+                    else if(weatherCondition == 61 || weatherCondition == 63 | weatherCondition == 65){ // its raining weather
+                        weatherIcon = "bi-cloud-drizzle-fill" // icon for more rain
+                        weatherIconColor = "blue"
+                    }
+                    else if(weatherCondition == 71 || weatherCondition == 73 | weatherCondition == 75){ // its snowing weather
+                        weatherIcon = "bi-snow" // icon of a snowflake
+                    }
+                    else if (weatherCondition == 95){ // Its a thunderstorm
+                        weatherIcon = "bi-cloud-lightning-rain-fill" // icon of a thunderstorm
+                    }
+                    document.querySelector("#currentTemperature i").className = `${weatherIcon}` // set the i tags icon to the weatherIcon
+                    document.querySelector("#currentTemperature i").style.color = `${weatherIconColor}` // set the i tags color to the weatherIconColor
+
+                    // Store the humidity condition for bootstrap dynamic icons
+                    // This is similar to the weather conditions but for humidity instead of weather.
+                    // We have a similar code block to set the humidityIcon and humidityIconColor.
+                    const humidityCondition = objData.current.relative_humidity_2m
+                    let humidityIcon = ""
+                    if(humidityCondition <= 30){ // less than 30% humidity, its dry
+                        humidityIcon = "bi bi-droplet"
+                    }
+                    else if(humidityCondition > 30 && humidityCondition <= 60){ // between 30 and 60 percent humidity, its normal
+                        humidityIcon = "bi bi-droplet-half"
+                    }
+                    else if(humidityCondition > 60){ // greater than 60 percent humidity, its wet
+                        humidityIcon = "bi bi-droplet-fill"
+                    }
+                    document.querySelector("#currentHumidity i").className = `${humidityIcon}`
+
+                    // Insert the waypoint icon bootstrap dynamic icon
+                    const waypointIcon = "bi bi-geo-alt-fill"
+                    const waypointIconColor = "red"
+                    document.querySelector("#currentTimeLocation i").className = `${waypointIcon}`
+                    document.querySelector("#currentTimeLocation i").style.color = `${waypointIconColor}`
+//This ends the section of code used with chatGPT,
+                } catch(objError){
+                    console.log('Error fetching objData',objError)
+                }
+            }
+
+        </script>
+    </body>
+    </html>
+    
+    <!-- Begin Footer -->
+    <!-- All live weather data provided by the app is thanks to Open Meteo " https://open-meteo.com/en/docs" -->
+    <!-- End Footer -->
